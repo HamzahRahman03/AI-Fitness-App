@@ -6,7 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users")  //to avoid conflict with a table with same name if it exists in the db
 @Data
 public class User {
     @Id
