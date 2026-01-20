@@ -5,6 +5,8 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "users")  //to avoid conflict with a table with same name if it exists in the db
 @Data
@@ -22,10 +24,13 @@ public class User {
     private String firstName;
     private String lastName;
 
+    @Enumerated(EnumType.STRING)
+    private UserRole role = UserRole.USER;
+
     @CreationTimestamp
-    private String createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    private String updatedAt;
+    private LocalDateTime updatedAt;
 
 }

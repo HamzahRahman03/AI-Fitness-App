@@ -1,5 +1,6 @@
 package com.fitness.userservice.controller;
 
+import com.fitness.userservice.dto.UserResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
