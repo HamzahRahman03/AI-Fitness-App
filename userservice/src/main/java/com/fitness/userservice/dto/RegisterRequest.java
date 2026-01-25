@@ -13,7 +13,7 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank(message = "password cannot be blank")
-    @Size(min = 8, message = "password should contain more than 8 characters")
+    @Size(min = 8, message = "password must have more than 8 characters")
     private String password;
 
     private String firstName;
