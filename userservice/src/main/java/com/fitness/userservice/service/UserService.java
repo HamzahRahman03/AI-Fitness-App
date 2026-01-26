@@ -10,24 +10,30 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserService {
-    public UserResponse getUserProfile(String userId){
-        User user = new User();
+    @Autowired
+    private UserRepository userRepository;
 
-        user.getId();
-        user.getEmail();
-        user.getPassword();
-        user.getFirstName();
-        user.getLastName();
-        user.getCreatedAt();
-        user.getUpdatedAt();
+    public UserResponse getUserProfile(String userId){
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User does not exist"));
+
+        UserResponse userResponse = new UserResponse();
+        userResponse.setId(user.getId());
+        userResponse.setEmail(user.getEmail());
+        userResponse.setPassword(user.getPassword());
+        userResponse.setFirstName(user.getFirstName());
+        userResponse.setLastName(user.getLastName());
+        userResponse.setCreatedAt(user.getCreatedAt());
+        userResponse.setUpdatedAt(user.getUpdatedAt());
+
+        return userResponse;
     }
 
-    @Autowired
-    UserRepository userRepository;
 
     public UserResponse register(@Valid RegisterRequest request) {
 
-        if(userRepository.existsByEmail(request.getEmail())){
+        if(userRepository.existsByEmail(request.getEmail())){   // need to define existsByEmail as it is not predefined in JpaRepository.
             throw new RuntimeException("User already exists");
         }
 
