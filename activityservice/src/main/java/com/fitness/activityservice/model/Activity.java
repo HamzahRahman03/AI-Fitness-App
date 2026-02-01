@@ -23,10 +23,10 @@ public class Activity {
     @Id
     private String id;
     private String userId;
+    private ActivityType type;
     private LocalDateTime startTime;
     private Integer duration;
     private Integer caloriesBurnt;
-    private ActivityType type;
 
     @CreatedDate
     private LocalDateTime createdAt;
