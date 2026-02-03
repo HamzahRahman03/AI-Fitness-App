@@ -6,7 +6,9 @@ import com.fitness.activityservice.model.Activity;
 import com.fitness.activityservice.repository.ActivityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -44,5 +46,24 @@ public class ActivityService {
         activityResponse.setUpdatedAt(savedActivity.getUpdatedAt());
 
         return activityResponse;
+    }
+
+    public List<ActivityResponse> getUserActivities(String userId) {
+        List<Activity> userActivities = activityRepository.findByUserId(userId);
+
+        return userActivities.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public ActivityResponse getActivityById(String activityid) {
+//        Activity activity = activityRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("id does not exist"));
+//
+//        return mapToResponse(activity);
+
+        return activityRepository.findById(activityid)
+                .map(this::mapToResponse)
+                .orElseThrow(() -> new RuntimeException("Activity not found with id:" + activityid));
     }
 }
