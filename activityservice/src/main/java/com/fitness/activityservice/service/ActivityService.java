@@ -57,11 +57,6 @@ public class ActivityService {
     }
 
     public ActivityResponse getActivityById(String activityid) {
-//        Activity activity = activityRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("id does not exist"));
-//
-//        return mapToResponse(activity);
-
         return activityRepository.findById(activityid)
                 .map(this::mapToResponse)
                 .orElseThrow(() -> new RuntimeException("Activity not found with id:" + activityid));
