@@ -6,11 +6,13 @@ import com.fitness.userservice.model.User;
 import com.fitness.userservice.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UserService {
     private UserRepository userRepository;
 
@@ -60,6 +62,7 @@ public class UserService {
     }
 
     public Boolean validateUserById(String userId) {
+        log.info("Validate User API called for user:" + userId);
         return userRepository.existsById(userId);
     }
 }

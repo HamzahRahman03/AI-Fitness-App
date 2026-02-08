@@ -1,6 +1,7 @@
 package com.fitness.activityservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpRange;
 import org.springframework.http.HttpStatus;
@@ -12,10 +13,12 @@ import java.net.http.HttpResponse;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserValidationService {
     private final WebClient userServiceWebClient;
 
     public boolean validateUser(String userId){
+        log.info("Calling Validate User API for user: {}", userId);
         try{
             return userServiceWebClient.get()
                     .uri("/api/users/{userId}/validate", userId)
@@ -24,7 +27,7 @@ public class UserValidationService {
                     .block();
         } catch (WebClientResponseException e) {
             if(e.getStatusCode() == HttpStatus.NOT_FOUND){
-                throw new RuntimeException("User Not Found" + userId);
+                throw new RuntimeException("User Service endpoint not found");
             }
             else if (e.getStatusCode() == HttpStatus.BAD_REQUEST){
                 throw new RuntimeException("Invalid Request" + userId);
