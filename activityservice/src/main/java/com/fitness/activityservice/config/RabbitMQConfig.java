@@ -9,13 +9,19 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
+    @Value("${spring.rabbitmq.exchange.name}")
+    private String exchange;
+
+    @Value("${spring.rabbitmq.queue.name}")
+    private String queue;
+
     @Bean
-    public DirectExchange activityExchange(@Value("${spring.rabbitmq.exchange.name}") String exchange){
+    public DirectExchange activityExchange(){
         return new DirectExchange(exchange);
     }
 
     @Bean
-    public Queue activityQueue(@Value("${spring.rabbitmq.queue.name}") String queue){
+    public Queue activityQueue(){
         return new Queue(queue, true);
     }
 
