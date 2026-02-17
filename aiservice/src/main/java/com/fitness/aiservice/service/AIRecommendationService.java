@@ -32,10 +32,19 @@ public class AIRecommendationService {
                     .get(0)
                     .path("content")
                     .path("parts")
-                    .get(0);
+                    .get(0)
+                    .path("text");
+
+            String jsonContent = textNode.asText()
+                    .replaceAll("```json\n", "")
+                    .replaceAll("```", "")
+                    .trim() ;
+
+            log.info("PARSED RESPONSE FROM AI : {}", jsonContent);
 
         } catch (Exception e){
-            e.printStackTrace();
+//            e.printStackTrace();
+            log.error("Failed to parse JSON response", e);
         }
     }
 
