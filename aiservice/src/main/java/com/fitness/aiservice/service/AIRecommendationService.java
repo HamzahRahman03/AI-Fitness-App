@@ -19,11 +19,11 @@ public class AIRecommendationService {
         String aiResponse = geminiService.getResponseFromAi(prompt);
         log.info("RESPONSE FROM AI : {}", aiResponse);
 
-        processAIRepsonse(activity, aiResponse);
+        processAIResponse(activity, aiResponse);
         return aiResponse;
     }
 
-    private void processAIRepsonse(Activity activity, String aiResponse){
+    private void processAIResponse(Activity activity, String aiResponse){
         try{
             ObjectMapper objectMapper = new ObjectMapper();
 
@@ -50,19 +50,36 @@ public class AIRecommendationService {
 
     private String createPromptForActivity(Activity activity) {
         return String.format("""
-                        Analyse the activity and the metrics of it. Suggest improvements and safety measures.
-                        Generate a recommendation for the following activity in JSON format.
-                                The JSON must include:
-                                {
-                                    "overview": "Two-line summary of the current activity",
-                                    "recommendation": "Two-line improvement recommendation"
-                                }
-                                Activity details:
-                                {
-                                    "type": "%s",
-                                    "duration": "%s",
-                                    "caloriesBurnt": "%s"
-                                }
+                        For the following activity, analyse the metrics and generate safety measures, recommendation and improvements in JSON format.
+                         The JSON must include:
+                        {
+                                "analysis": {
+                                                "overall": "Overall analysis",
+                                                "heartRate": "Heart rate analysis",
+                                                "caloriesBurned": "Calory analysis"
+                                },
+                                "improvements": [
+                                         {       "area": "area name",
+                                                "recommendation": "detailed recommendation"
+                                         },
+                                ],
+                                "suggestions": [
+                                        {
+                                                "workout": "Workout name",
+                                                "description": "Detailed workout description"
+                                        }
+                                ],
+                                "safety":[
+                                        "safety point 1",
+                                        "safety point 2"
+                                ]
+                        }
+       
+        Analyse this activity:
+        Activity Type: %s
+        Duration: %d minutes
+        Calories Burnt: %d
+        
         Provide only valid JSON, do not include explanations or text outside the JSON object.
         """,
                 activity.getType(),
