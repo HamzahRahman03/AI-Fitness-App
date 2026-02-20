@@ -2,10 +2,7 @@ package com.fitness.aiservice.service;
 
 import com.fitness.aiservice.model.Recommendation;
 import com.fitness.aiservice.respository.RecommendationRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

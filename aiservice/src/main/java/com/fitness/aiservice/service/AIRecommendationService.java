@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -42,10 +45,28 @@ public class AIRecommendationService {
 
             log.info("PARSED RESPONSE FROM AI : {}", jsonContent);
 
+            JsonNode parsedJsonContent = objectMapper.readTree(jsonContent);
+            JsonNode analysisNode = parsedJsonContent.path("analysis");
+
+            String overallAnalysisString = createAnalysisString(analysisNode, "overall", "Overall: ");
+            String heartRateAnalysisString = createAnalysisString(analysisNode, "heartRate", "Heart Rate: ");
+            String caloriesBurntAnalysisString = createAnalysisString(analysisNode, "caloriesBurnt", "Calories Burnt: ");
+
         } catch (Exception e){
 //            e.printStackTrace();
             log.error("Failed to parse JSON response", e);
         }
+    }
+
+    private String createAnalysisString(JsonNode analysisNode, String key, String prefix ) {
+        StringBuilder analysisStringBuilder = new StringBuilder();
+        if(!analysisNode.path(key).isMissingNode()){
+            analysisStringBuilder.append(prefix + analysisNode.path(key));
+        }
+
+        String obtainedString = analysisStringBuilder.toString();
+        log.info(obtainedString);
+        return obtainedString;
     }
 
     private String createPromptForActivity(Activity activity) {
@@ -56,7 +77,7 @@ public class AIRecommendationService {
                                 "analysis": {
                                                 "overall": "Overall analysis",
                                                 "heartRate": "Heart rate analysis",
-                                                "caloriesBurned": "Calory analysis"
+                                                "caloriesBurnt": "Calory analysis"
                                 },
                                 "improvements": [
                                          {       "area": "area name",
@@ -69,7 +90,7 @@ public class AIRecommendationService {
                                                 "description": "Detailed workout description"
                                         }
                                 ],
-                                "safety":[
+                                "safetyMeasures":[
                                         "safety point 1",
                                         "safety point 2"
                                 ]
