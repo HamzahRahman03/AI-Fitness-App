@@ -3,6 +3,8 @@ package com.fitness.aiservice.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fitness.aiservice.model.Activity;
+import com.fitness.aiservice.model.Recommendation;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -48,25 +50,23 @@ public class AIRecommendationService {
             JsonNode parsedJsonContent = objectMapper.readTree(jsonContent);
             JsonNode analysisNode = parsedJsonContent.path("analysis");
 
-            String overallAnalysisString = createAnalysisString(analysisNode, "overall", "Overall: ");
-            String heartRateAnalysisString = createAnalysisString(analysisNode, "heartRate", "Heart Rate: ");
-            String caloriesBurntAnalysisString = createAnalysisString(analysisNode, "caloriesBurnt", "Calories Burnt: ");
+
+            StringBuilder analysisStringBuilder = new StringBuilder();
+            createAnalysisString(analysisNode, analysisStringBuilder, "overall", "Overall: ");
+            createAnalysisString(analysisNode, analysisStringBuilder, "heartRate", "Heart Rate: ");
+            createAnalysisString(analysisNode, analysisStringBuilder, "caloriesBurnt", "Calories Burnt: ");
 
         } catch (Exception e){
-//            e.printStackTrace();
             log.error("Failed to parse JSON response", e);
         }
     }
 
-    private String createAnalysisString(JsonNode analysisNode, String key, String prefix ) {
-        StringBuilder analysisStringBuilder = new StringBuilder();
+    private void createAnalysisString(JsonNode analysisNode, StringBuilder analysisStringBuilder, String key, String prefix ) {
         if(!analysisNode.path(key).isMissingNode()){
-            analysisStringBuilder.append(prefix + analysisNode.path(key));
+            analysisStringBuilder.append(prefix)
+                    .append(analysisNode.path(key))
+                    .append("\n");
         }
-
-        String obtainedString = analysisStringBuilder.toString();
-        log.info(obtainedString);
-        return obtainedString;
     }
 
     private String createPromptForActivity(Activity activity) {
