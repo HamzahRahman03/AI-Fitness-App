@@ -9,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -19,16 +21,14 @@ public class AIRecommendationService {
 
     private final GeminiService geminiService;
 
-    public String generateRecommendation(Activity activity){
+    public Recommendation generateRecommendation(Activity activity){
         String prompt = createPromptForActivity(activity);
         String aiResponse = geminiService.getResponseFromAi(prompt);
-        log.info("RESPONSE FROM AI : {}", aiResponse);
-
-        processAIResponse(activity, aiResponse);
-        return aiResponse;
+//        String aiResponse = "";   //default recommendation generation
+        return processAIResponse(activity, aiResponse);
     }
 
-    private void processAIResponse(Activity activity, String aiResponse){
+    private Recommendation processAIResponse(Activity activity, String aiResponse){
         try{
             ObjectMapper objectMapper = new ObjectMapper();
 
@@ -56,9 +56,38 @@ public class AIRecommendationService {
             createAnalysisString(analysisNode, analysisStringBuilder, "heartRate", "Heart Rate: ");
             createAnalysisString(analysisNode, analysisStringBuilder, "caloriesBurnt", "Calories Burnt: ");
 
+            List<String> improvementsList = extractImprovements(parsedJsonContent.path("improvements"));
+            List<String> suggestionsList = extractSuggestions(parsedJsonContent.path("suggestions"));
+            List<String> safetyMeasuresList = extractSafetyMeasures(parsedJsonContent.path("safety measures"));
+
+            return Recommendation.builder()
+                    .activityId(activity.getId())
+                    .userId(activity.getUserId())
+                    .activityType(activity.getType())
+                    .recommendation(analysisStringBuilder.toString().trim())
+                    .createdAt(String.valueOf(LocalDateTime.now()))
+                    .improvements(improvementsList)
+                    .suggestions(suggestionsList)
+                    .safetyMeasures(safetyMeasuresList)
+                    .build();
+
         } catch (Exception e){
             log.error("Failed to parse JSON response", e);
+            return generateDefaultRecommendation(activity);
         }
+    }
+
+    private Recommendation generateDefaultRecommendation(Activity activity) {
+        return Recommendation.builder()
+                .activityId(activity.getId())
+                .userId(activity.getUserId())
+                .activityType(activity.getType())
+                .recommendation("Failed to generate detailed analysis.")
+                .createdAt(String.valueOf(LocalDateTime.now()))
+                .improvements(Collections.singletonList("Continue with your general warm up routine."))
+                .suggestions(Collections.singletonList("Do not forget to warm up and stretch properly before exercises."))
+                .safetyMeasures(Collections.singletonList("Stay hydrated and always listen to your body."))
+                .build();
     }
 
     private void createAnalysisString(JsonNode analysisNode, StringBuilder analysisStringBuilder, String key, String prefix ) {
@@ -68,6 +97,46 @@ public class AIRecommendationService {
                     .append("\n");
         }
     }
+
+    private List<String> extractImprovements(JsonNode improvementsNode) {
+        List<String> improvements = new ArrayList<>();
+
+        if(improvementsNode.isArray()){
+            improvementsNode.forEach(improvement -> {
+                String area = improvement.path("area").asText();
+                String detail = improvement.path("recommendation").asText();
+                improvements.add(String.format("%s: %s", area, detail));
+            });
+        }
+        return improvements.isEmpty() ? Collections.singletonList("No specific  improvements provided.") : improvements;
+    }
+
+    private List<String> extractSuggestions(JsonNode suggestionsNode) {
+        List<String> suggestionsList = new ArrayList<>();
+
+        if(suggestionsNode.isArray()){
+            suggestionsNode.forEach(suggestion -> {
+                String workout = suggestion.path("workout").asText();
+                        String description = suggestion.path("description").asText();
+                        suggestionsList.add(String.format("%s: %s", workout, description));
+            });
+        }
+
+        return suggestionsList.isEmpty() ? Collections.singletonList("No specific suggestions provided.") : suggestionsList;
+    }
+
+    private List<String> extractSafetyMeasures(JsonNode safetyMeasuresNode) {
+        List<String> safetyMeasures = new ArrayList<>();
+
+        if(safetyMeasuresNode.isArray()){
+            safetyMeasuresNode.forEach(safetyMeasure ->
+                safetyMeasures.add(safetyMeasure.asText()));
+        }
+
+        return safetyMeasures.isEmpty() ? Collections.singletonList("Follow general safety guidelines") : safetyMeasures;
+    }
+
+
 
     private String createPromptForActivity(Activity activity) {
         return String.format("""
@@ -80,7 +149,7 @@ public class AIRecommendationService {
                                                 "caloriesBurnt": "Calory analysis"
                                 },
                                 "improvements": [
-                                         {       "area": "area name",
+                                         {      "area": "area name",
                                                 "recommendation": "detailed recommendation"
                                          },
                                 ],
@@ -90,7 +159,7 @@ public class AIRecommendationService {
                                                 "description": "Detailed workout description"
                                         }
                                 ],
-                                "safetyMeasures":[
+                                "safety measures":[
                                         "safety point 1",
                                         "safety point 2"
                                 ]

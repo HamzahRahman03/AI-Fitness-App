@@ -31,8 +31,8 @@ public class Recommendation {
     @LastModifiedDate
     private String updatedAt;
 
-    private List<String> safetyMeasures;
-    private List<String> suggestions;
     private List<String> improvements;
+    private List<String> suggestions;
+    private List<String> safetyMeasures;
 
 }
