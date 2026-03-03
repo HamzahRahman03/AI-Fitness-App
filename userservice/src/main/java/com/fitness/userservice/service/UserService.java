@@ -38,7 +38,7 @@ public class UserService {
 
         if(userRepository.existsByEmail(request.getEmail())){   // need to define existsByEmail as it is not predefined in JpaRepository.
 //            throw new RuntimeException("User already exists");
-            User existingUser = userRepository.findByEmail(reques t.getEmail());
+            User existingUser = userRepository.findByEmail(request.getEmail());
             UserResponse userResponse = new UserResponse();
             userResponse.setId(existingUser.getId());
             userResponse.setKeyCloakId(existingUser.getKeyCloakId());
