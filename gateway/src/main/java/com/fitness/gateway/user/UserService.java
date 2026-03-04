@@ -6,6 +6,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 @Service
 @RequiredArgsConstructor
@@ -13,31 +14,21 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService {
     private final WebClient userServiceWebClient;
 
-    public boolean validateUser(String userId){
+    public Mono<Boolean> validateUser(String userId) {
         log.info("Calling Validate User API for user: {}", userId);
 
-        try{
-//            return userServiceWebClient.get()
-//                    .uri("/api/users/{userId}/validate", userId)
-//                    .retrieve()
-//                    .bodyToMono(Boolean.class)
-//                    .block();
+        return userServiceWebClient.get()
+                .uri("/api/users/{userId}/validate", userId)
+                .retrieve()
+                .bodyToMono(Boolean.class)
+                .onErrorResume(WebClientResponseException.class, e -> {
+                    if (e.getStatusCode() == HttpStatus.NOT_FOUND)
+                        return Mono.error(new RuntimeException("User Service endpoint not found"));
 
-            return Boolean.TRUE.equals(userServiceWebClient.get()
-                    .uri("/api/users/{userId}/validate", userId)
-                    .retrieve()
-                    .bodyToMono(Boolean.class)
-                    .block());
-        }
+                    else if (e.getStatusCode() == HttpStatus.BAD_REQUEST)
+                        return Mono.error(new RuntimeException("Invalid Request" + userId));
 
-        catch (WebClientResponseException e) {
-            if(e.getStatusCode() == HttpStatus.NOT_FOUND){
-                throw new RuntimeException("User Service endpoint not found");
-            }
-            else if (e.getStatusCode() == HttpStatus.BAD_REQUEST){
-                throw new RuntimeException("Invalid Request" + userId);
-            }
-        }
-        return false;
+                    return Mono.error(new RuntimeException("Unexpected error:" + e.getMessage()));
+                });
     }
 }
