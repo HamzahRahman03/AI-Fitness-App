@@ -31,4 +31,23 @@ public class UserService {
                     return Mono.error(new RuntimeException("Unexpected error:" + e.getMessage()));
                 });
     }
+
+    public Mono<UserResponse> registerUser(RegisterRequest request) {
+        log.info("Calling Register User API for user email: {}", request.getEmail());
+
+        return userServiceWebClient.post()
+                .uri("/api/users/register")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(UserResponse.class)
+                .onErrorResume(WebClientResponseException.class, e -> {
+                    if (e.getStatusCode() == HttpStatus.NOT_FOUND)
+                        return Mono.error(new RuntimeException("User Service endpoint not found"));
+
+                    else if (e.getStatusCode() == HttpStatus.BAD_REQUEST)
+                        return Mono.error(new RuntimeException("Invalid Request: " + request));
+
+                    return Mono.error(new RuntimeException("Unexpected error:" + e.getMessage()));
+                });
+    }
 }
