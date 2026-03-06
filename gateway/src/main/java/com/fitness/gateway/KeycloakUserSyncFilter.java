@@ -50,7 +50,7 @@ public class KeycloakUserSyncFilter implements WebFilter {
                         return filterChain.filter(exchange.mutate().request(mutatedRequest).build());
                     }));
         }
-        return filterChain.filter(exchange );
+        return filterChain.filter(exchange);
     }
 
     private RegisterRequest getUserDetails(String token) {
