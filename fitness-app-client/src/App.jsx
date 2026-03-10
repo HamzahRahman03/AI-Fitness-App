@@ -2,7 +2,13 @@ import { Button } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "react-oauth2-code-pkce";
 import { useDispatch } from "react-redux";
-import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from "react-router";
+import {
+  BrowserRouter as Router,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router";
 import { setCredentials } from "./store/authSlice";
 
 function App() {
@@ -11,20 +17,31 @@ function App() {
   const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
-    if(token){
-      dispatch(setCredentials({token, user: tokenData}));
+    if (token) {
+      dispatch(setCredentials({ token, user: tokenData }));
       setAuthReady(true);
     }
   }, [token, tokenData, dispatch]);
 
   return (
-    <>
-    <Button variant="contained" color="#3b8093"
-            onClick={() => {
-              logIn();
-            }}>Login</Button>
-    </>
-  )
+    <Router>
+      {!token ? (
+        <Button
+          variant="contained"
+          onClick={() => {
+            logIn();
+          }}
+        >
+          Login
+        </Button>
+      ) : (
+        <div>
+          <pre>{JSON.stringify(tokenData, null, 2)}</pre>
+          <pre>{JSON.stringify(token, null, 2)}</pre>
+        </div>
+      )}
+    </Router>
+  );
 }
 
-export default App
+export default App;
