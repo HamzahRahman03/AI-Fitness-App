@@ -11,13 +11,16 @@ import {
 } from "react-router";
 import { setCredentials } from "./store/authSlice";
 import ActivityDetails from "./components/ActivityDetails";
-
+import ActivityForm from "./components/ActivityForm";
+import ActivityList from "./components/ActivityList";
 
 const ActivitiesPage = () => {
+  return (
     <Box component="section" sx={{ p: 2, border: "1px dashed grey" }}>
       <ActivityForm onActivitiesAdded={() => window.location.reload()} />
       <ActivityList />
     </Box>
+  );
 };
 
 function App() {
