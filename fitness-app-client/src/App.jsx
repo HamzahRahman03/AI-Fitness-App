@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button, Box } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "react-oauth2-code-pkce";
 import { useDispatch } from "react-redux";
@@ -10,9 +10,20 @@ import {
   useLocation,
 } from "react-router";
 import { setCredentials } from "./store/authSlice";
+import ActivityDetails from "./components/ActivityDetails";
+
+
+const ActivitiesPage = () => {
+    <Box component="section" sx={{ p: 2, border: "1px dashed grey" }}>
+      <ActivityForm onActivitiesAdded={() => window.location.reload()} />
+      <ActivityList />
+    </Box>
+};
 
 function App() {
-  const { token, tokenData, logIn, logOut, isAuthenticated } = useContext(AuthContext);
+  const { token, tokenData, logIn, logOut, isAuthenticated } =
+    useContext(AuthContext);
+
   const dispatch = useDispatch();
   const [authReady, setAuthReady] = useState(false);
 
@@ -35,10 +46,27 @@ function App() {
           Login
         </Button>
       ) : (
-        <div>
-          <pre>{JSON.stringify(tokenData, null, 2)}</pre>
-          <pre>{JSON.stringify(token, null, 2)}</pre>
-        </div>
+        // <div>
+        //   <pre>{JSON.stringify(tokenData, null, 2)}</pre>
+        //   <pre>{JSON.stringify(token, null, 2)}</pre>
+        // </div>
+
+        <Box component="section" sx={{ p: 2, border: "1px dashed grey" }}>
+          <Routes>
+            <Route path="/activities" element={<ActivitiesPage />} />
+            <Route path="/activities/:id" element={<ActivityDetails />} />
+            <Route
+              path="/"
+              element={
+                token ? (
+                  <Navigate to="/activities" replace />
+                ) : (
+                  <div>Welcome, please login!</div>
+                )
+              }
+            />
+          </Routes>
+        </Box>
       )}
     </Router>
   );
