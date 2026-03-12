@@ -48,7 +48,9 @@ public class ActivityService {
                 .additionalMetrics(request.getAdditionalMetrics())
                 .build();
 
+        log.info("BEFORE SAVING ACTIVITY: {}", activity.getId());
         Activity savedActivity = activityRepository.save(activity);
+        log.info("SAVED ACTIVITY: {}", savedActivity.getId());
 
         try{
             template.convertAndSend(exchange, routingKey, savedActivity);

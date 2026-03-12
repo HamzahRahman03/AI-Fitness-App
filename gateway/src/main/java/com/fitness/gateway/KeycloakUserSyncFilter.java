@@ -21,10 +21,12 @@ public class KeycloakUserSyncFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain filterChain){
-//        String userId = exchange.getRequest().getHeaders().getFirst("X-USER-ID");
+        String userId = exchange.getRequest().getHeaders().getFirst("X-USER-ID");
+        log.info("USER ID: {}", userId);
         String token = exchange.getRequest().getHeaders().getFirst("Authorization");
         RegisterRequest registerRequest = getUserDetails(token);
         String keycloakId = registerRequest.getKeyCloakId();
+        log.info("Keycloak ID: {}", keycloakId);
 
         if(keycloakId != null && token != null){
             return userService.validateUser(keycloakId)

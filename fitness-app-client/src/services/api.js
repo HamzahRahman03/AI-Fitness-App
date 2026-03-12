@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = 'https://localhost:8080/api';
+const API_URL = 'http://localhost:8080/api';
 
 const api = axios.create({
     baseURL: API_URL
@@ -8,6 +8,15 @@ const api = axios.create({
 
 api.interceptors.request.use((config) =>{
     const userId = localStorage.getItem('userId');
+    const token = localStorage.getItem('token');
+
+    if(token){
+        config.headers['Authorization'] = `Bearer ${token}`
+    }
+    if(userId){
+        config.headers['X-User-Id'] = userId; 
+    }
+
     if(userId){
         config.headers['X-User-Id'] = userId; 
     }
@@ -16,6 +25,6 @@ api.interceptors.request.use((config) =>{
 });
 
 export const getActivities = () => api.get('/activities');
-export const addActivity = (activity) => api.post('/activity', activity);
+export const addActivity = (activity) => api.post('/activities', activity);
 export const getActivityDetails = () => api.get('/recommendations/activity/${activityId}');
 
