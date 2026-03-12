@@ -7,10 +7,15 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) =>{
+    const userId = localStorage.getItem('userId');
+    if(userId){
+        config.headers['X-User-Id'] = userId; 
+    }
 
+    return config;
 });
 
 export const getActivities = () => api.get('/activities');
-export const addActivity = () => api.post('/activity', activity);
+export const addActivity = (activity) => api.post('/activity', activity);
 export const getActivityDetails = () => api.get('/recommendations/activity/${activityId}');
 
